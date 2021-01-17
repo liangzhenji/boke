@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
+<head>
+	<title>用户登录</title>
+	<!-- Meta tag Keywords -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8" />
+	<meta name="keywords" content=""/>
+	<link rel="icon" href="/img/pagelogo.png" />
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
+	
+	<script type="text/javascript" src="js/jquery-1.8.0.js"></script>
+	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+	
+	<!-- Style-CSS -->
+	<link rel="stylesheet" href="css/fontawesome-all.css">
+	<script type="text/javascript">
+
+		addEventListener("load", function () {
+			setTimeout(hideURLbar, 0);
+		}, false);
+
+		function hideURLbar() {
+			window.scrollTo(0, 1);
+		}
+
+		$(function(){
+		$("#button").click(function(){
+			var loginName = $("#loginName");
+			var password = $("#password");
+			var msg = "";
+			if(loginName.val() == ""){
+				msg = "登录名称不能为空!";
+				loginName.focus();
+			}else if(password.val() == ""){
+				msg = "密码不能为空!";
+				password.focus();
+			}
+			if(msg != ""){
+				alert(msg);
+				return false;
+			}
+			$("#button").submit();
+		});
+	});
+	</script>
+	<!-- Meta tag Keywords -->
+	<!-- css files -->
+	<!-- Font-Awesome-Icons-CSS -->
+	<!-- //css files -->
+	<!-- web-fonts -->
+	<!-- //web-fonts -->
+</head>
+
+<body>
+	<!-- bg effect -->
+	<div id="bg">
+		<canvas></canvas>
+		<canvas></canvas>
+		<canvas></canvas>
+	</div>
+	<!-- //bg effect -->
+	<!-- title -->
+	<h1>欢迎来到筑梦园大家庭</h1>
+	<!-- //title -->
+	<!-- content -->
+	<div class="sub-main-w3">
+		<form method="post" th:action="@{/login}">
+			<h2>Login Now
+			</h2>
+			<div class="form-style-agile">
+				<label>
+					<i class="fas fa-user"></i>
+					登录名
+				</label>
+				<input placeholder="Username" name="loginName" type="text" required="" id="loginName" th:value="${loginname}">
+			</div>
+			<div class="form-style-agile">
+				<label>
+					<i class="fas fa-unlock-alt"></i>
+					密码
+				</label>
+				<input placeholder="Password" name="password" type="password" required="" id="password" th:value="${password}">
+			</div>
+			<!-- checkbox -->
+			<div class="wthree-text">
+				<ul>
+					<li>
+						<label class="anim">
+							<input type="checkbox" class="checkbox" required="">
+							<span>保持登录</span>
+						</label>
+					</li>
+					<li>
+						<a href="/forgetpassword">忘记密码?</a>
+					</li>
+					<li style="height:40px;width:auto;display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */">
+						<label style="cursor: default;">
+							<span>其它登录方式&nbsp;:</span>
+						</label>
+						<label>
+							<span onclick="setWxerwma()"><img style="height:40px;width:40px;" src="img/weixin.png" alt="微信登录" /></span>
+						</label>
+					</li>
+					
+				</ul>
+			</div>
+			<!-- //checkbox -->
+			<input type="submit" value="登入" id="button">
+		</form>
+	</div>
+	<!-- //content -->
+	<!-- copyright -->
+	<div class="footer">
+		<p>Copyright &copy; 2019.Company name All rights reserved.<a target="_blank" href="/home">筑梦园</a></p>
+	</div>
+    <!-- 微信登录按钮弹窗 -->
+	<div id="wxLoginQR" style="
+	position:absolute;
+    top:30%;
+    left:70%;
+    display: none;"></div>
+	<!-- //copyright -->
+	
+	<!-- //Jquery -->
+
+	<!-- effect js -->
+	<script type="text/javascript">
+	<!-- //effect js  微信登录二维码弹窗-->
+		function setWxerwma () {
+			  $("#wxLoginQR").toggle();
+		      const s = document.createElement('script')
+		      s.type = 'text/javascript'
+		      s.src = 'https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js'
+		      const wxElement = document.body.appendChild(s)
+		      wxElement.onload = function () {
+		        var obj = new WxLogin({
+		       		 id: 'wxLoginQR', // 需要显示的容器id
+		          appid: 'wx1b13f2dde3d156d9', // 公众号appid wx*******
+		        	 scope: 'snsapi_login', // 网页默认即可
+		          redirect_uri: encodeURIComponent('https://dc152e0d.ngrok.io/getcode'), // 授权成功后回调的url
+		          state: Math.ceil(Math.random() * 1000), // 可设置为简单的随机数加session用来校验
+		          style: 'black', // 提供"black"、"white"可选。二维码的样式
+		          href: '' // 外部css文件url，需要https
+		        })
+		      }
+          }
+	</script>
+</body>
+</html>

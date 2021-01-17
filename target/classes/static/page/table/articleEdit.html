@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+    <script src="../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <script src="http://www.jq22.com/jquery/jquery-1.7.1.js"></script>
+    <script>
+  //请求分类列表
+  layui.use([], function () {
+	  var layer = layui.layer;
+   $(document).ready(function () {
+	   $.ajax({
+	        type: "POST",
+	        url: "/hc/getAllType",
+	        contentType: "application/json; charset=utf-8",
+	        data: "",
+	        dataType: "json",
+	        success: function (resp) {
+	        	for(var val in resp){
+	        		var html = '<input id="'+val+'" type="checkbox" name="type" value="'+val+'" title="'+resp[val]+'">';
+	        		$("#select").append(html);
+	        	}	        	
+	        },
+	        error: function (err) {
+	        	var index = layer.alert("分类加载出错", {
+	                title: '错误'
+	            }, function () {
+	                layer.close(index);
+	            });
+	        }
+	    })
+	    
+     });   
+  })
+    </script>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">标题</label>
+        <div class="layui-input-block">
+            <input type="text" id="title" name="title" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+   		 <label class="layui-form-label">分类</label>
+    		<div class="layui-input-block" id="select">
+    		</div>
+  </div>
+    <div class="layui-form-item">
+                <label class="layui-form-label required">发布日期</label>
+                <div class="layui-input-block">
+                    <input type="text" name="date" id="date" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item" style="display:none;">
+                <div class="layui-input-block">
+                    <input type="hidden" id="articleid" name="articleid" value="" class="layui-input">
+                </div>
+            </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="../../js/md5.js"></script>
+<script>
+    layui.use(['form','laydate'], function () {
+    	var laydate = layui.laydate;
+    	laydate.render({
+    		  elem: '#date'
+    		});
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+		//渲染已经获取的type标签
+		
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+        	var typeArray = new Array();
+        	$("input:checkbox[name='type']:checked").each(function(){
+        		typeArray.push($(this).val());
+        		});
+        	data.field.type = typeArray;
+        	console.log(data.field);
+        	$.ajax({
+                type: "POST",
+                url: "/hc/articleEdit",
+                data:JSON.stringify(data.field),
+                contentType: "application/json; charset=utf-8",
+                success: function (resp) {
+                	if(resp == "success"){
+                		window.parent.location.reload();
+                	}else{
+                		var index = layer.alert("修改失败", {
+    	                    title: '修改结果'
+    	                }, function () {
+    	                    layer.close(index);
+    	                });
+                	}                       
+                },
+                error: function (err) {
+                	var index = layer.alert("请求失败", {
+	                    title: '修改结果'
+	                }, function () {
+	                    layer.close(index);
+	                });
+                }
+            })
+         })
+        });
+</script>
+</body>
+</html>

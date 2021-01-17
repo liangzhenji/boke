@@ -1,0 +1,621 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- 用户名+筑梦园 -->
+<title th:text="${username}+' - '+'筑梦园'"></title>
+<!-- 评论 -->
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.css"/>
+
+<link rel="icon" href="/img/pagelogo.png" />
+<link href="/css/templatemo_style.css" rel="stylesheet" type="text/css" />
+<script src="/plugin/jquery.min.js"></script>
+<script src="/plugin/bootstrap/js/bootstrap.min.js"></script>
+<script language="javascript" type="text/javascript"></script>
+<!-- 模态框 -->
+  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+function clearText(field)
+{
+    if (field.defaultValue == field.value) field.value = '';
+    else if (field.value == '') field.value = field.defaultValue;
+}
+</script>
+<script th:inline="javascript">
+function follow(){
+	if([[${followuserid}]] == null){
+		//未登录
+		window.location.href="/login";
+	}else{
+$.get("/user/addfollow?userid="+[[${userid}]]+"&followuserid="+[[${followuserid}]],function(data,status){
+    if(data=="true"){    	
+    	$("#weiguanzhu").hide();
+    	$("#yiguanzhu").show();
+    }else{
+    	alert("添加关注错误");
+    }
+  })
+}
+}
+function addgredd(){
+	      var articleid=[[${articleid}]];
+	      var userid=[[${followuserid}]];
+	      if(userid != null){
+	      $.get("/user/addagreed?articleid="+articleid+"&userid="+userid,function(data,status){
+	    	    if(data=="false"){    	
+	    	    	$.get("/user/addagreedinfo?articleid="+articleid+"&userid="+userid,function(data,status){
+	    	    	    if(data=="true"){    
+	    	    	    	$("#agreed").text("点赞:"+(parseInt($("#agreed").text().substring(3,))+1))
+	    	    	    }else{
+	    	    	    	alert("点赞失败");
+	    	    	    }
+	    	    	  })
+	    	    }else{
+	    	    	alert("你已经点过赞了！！");
+	    	    }
+	    	  })
+	      }else{
+	    	  window.location.href="/login";
+	      }
+}
+function collection(){
+	var articleid=[[${articleid}]];
+    var userid=[[${followuserid}]];
+    if(userid != null){
+    $.get("/user/collection?articleid="+articleid+"&userid="+userid,function(data,status){
+  	    if(data != "true"){    	
+  	    	$('#myModal').modal();
+  	    }else{
+  	    	alert("你已经收藏过了！！");
+  	    }
+  	  })
+    }else{
+  	  window.location.href="/login";
+    }
+}
+$(document).ready(
+		function(){
+			$("form").submit(
+				function(e){
+					e.preventDefault();
+					var Title=$("#Title").val();
+					var Label=$("#Label").val();
+					var abstracts=$("#abstracts").val();
+					if(Title.trim() == '' || Label.trim() == ''){
+						alert("标题和标签不能为空！");
+					}else{
+						if(Title.length > 30){
+							alert("标题不能多于30字！");
+						}else{
+							if(Label.length >20){
+								alert("标签不能多于20字！");
+							}else{
+								if(abstracts.length > 100){
+									alert("摘要不能多于100字！");
+								}else{
+									registPost();
+								}
+							}
+						}
+					}
+				}		
+			)
+		}
+	)
+function registPost () {
+	$('#myModal').modal('hide');
+	var Title=$("#Title").val();
+	var Label=$("#Label").val();
+	var abstracts=$("#abstracts").val();
+	var articleid=[[${articleid}]];
+    var userid=[[${followuserid}]]; 
+    var articleurl=[[${articleurl}]];
+	$.get("/user/savecollection?Title="+Title+"&Label="+Label+"&abstracts="+abstracts+"&articleid="+articleid+"&userid="+userid+"&articleurl="+articleurl,function(data,status){
+  	    if(data == "true"){    	
+  	    	alert("收藏成功");
+  	    }else{
+  	    	alert("收藏失败");
+  	    }
+  	  })
+  /*
+   或者用jquery.form.min.js提交
+   $('#registSubmit').ajaxSubmit(function(message){
+      console.log(message);
+   })
+   */
+}
+</script>
+<!-- 评论的css -->
+<style>
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color:   rgba(0,0,0,0);
+}
+	.container{
+		width: 1000px;
+	}
+	.commentbox{
+		width: 900px;
+		margin: 20px auto;
+	}
+	.mytextarea {
+	    width: 100%;
+	    overflow: auto;
+	    word-break: break-all;
+	    height: 100px;
+	    color: #000;
+	    font-size: 1em;
+	    resize: none;
+	}
+	.comment-list{
+		width: 900px;
+		margin: 20px auto;
+		clear: both;
+		padding-top: 20px;
+	}
+	.comment-list .comment-info{
+		position: relative;
+		margin-bottom: 20px;
+		margin-bottom: 20px;
+		border-bottom: 1px solid #CF6B21;
+	}
+	.comment-list .comment-info header{
+		width: 10%;
+		position: absolute;
+	}
+	.comment-list .comment-info header img{
+		width: 100%;
+		border-radius: 50%;
+		padding: 5px;
+	}
+	.comment-list .comment-info .comment-right{
+		padding:5px 0px 5px 11%; 
+	}
+	.comment-list .comment-info .comment-right h3{
+		margin: 5px 0px;
+	}
+	.comment-list .comment-info .comment-right .comment-content-header{
+		height: 25px;
+	}
+	.comment-list .comment-info .comment-right .comment-content-header span,.comment-list .comment-info .comment-right .comment-content-footer span{
+		padding-right: 2em;
+		color: #aaa;
+	}
+	.comment-list .comment-info .comment-right .comment-content-header span,.comment-list .comment-info .comment-right .comment-content-footer span.reply-btn,.send,.reply-list-btn{
+		cursor: pointer;
+	}
+	.comment-list .comment-info .comment-right .reply-list {
+		border-left: 3px solid #ccc;
+		padding-left: 7px;
+	}
+	.comment-list .comment-info .comment-right .reply-list .reply{
+		border-bottom: 1px dashed #ccc;
+	}
+	.comment-list .comment-info .comment-right .reply-list .reply div span{
+		padding-left: 10px;
+		
+	}
+	.comment-list .comment-info .comment-right .reply-list .reply p span{
+		padding-right: 2em;
+		color: #aaa;
+	}
+</style>
+
+</head>
+<body>
+
+<div id="templatemo_header">
+            
+    <div id="site_title">
+        <!--名字+座右铭 -->
+        <a th:href="${userurl}" th:text="${username}+' - '+${graph}"></a>
+        
+    </div> <!-- end of site_title -->
+    
+    <div class="cleaner"></div>
+    
+</div> <!-- end of header -->
+
+<div id="templatemo_menu_wrapper">
+	
+    <div id="templatemo_menu">
+        <ul>
+            <li><a href="/home"><span></span>筑梦园</a></li>
+            <!-- 个人首页地址 -->
+            <li><a th:href="${userurl}"><span></span>首页</a></li>
+            <li><a th:href="${userurl}+'&tags=diary'"><span></span>日记</a></li>
+            <li><a th:href="${userurl}+'&tags=picture'"><span></span>照片墙</a></li>
+            <li><a href="/manage/pagemanage"><span></span>管理</a></li>
+        </ul>    	
+	</div>
+</div> <!-- end of templatemo_menu -->
+
+
+<div id="templatemo_main"> <span class="tm_bottom"></span>
+	
+<div id="templatemo_content">
+ 		<!-- 分类窗口 -->
+		<div class="post_box" th:each="article:${articles}" th:if="${articlebyidlisttag == 'open'}">
+            <div class="header">
+                <h2><a th:href="${article.Articleurl}" th:text="${article.Title}"></a></h2>
+              <div class="tag"><strong>Tags:</strong> <a th:each="articleclass:${article.articleclass}" th:text="${articleclass.Classname}+','" th:href="${articleclass.Classurl}"></a></div>
+                <span class="posted_date"  th:switch="${#strings.substring(article.Releasetime,5,7)}">
+                    <span th:case="'1'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Jan'"></span>
+                    <span th:case="'2'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Feb'"></span>
+                    <span th:case="'3'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Mar'"></span>
+                    <span th:case="'4'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Apr'"></span>
+                    <span th:case="'5'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'May'"></span>
+                    <span th:case="'6'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Jun'"></span>
+                    <span th:case="'7'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Jul'"></span>
+                    <span th:case="'8'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Aug'"></span>
+                    <span th:case="'9'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Sep'"></span>
+                    <span th:case="'10'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Oct'"></span>
+                    <span th:case="'11'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Nov'"></span>
+                    <span th:case="'12'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Dec'"></span>
+                        
+                    <strong th:text="${#strings.substring(article.Releasetime,0,4)}"></strong>
+                </span>
+            </div>
+            <div>
+                <p th:text="${article.Context}">
+                </p>
+                <div class="read" style="display:inline-block;margin-right:10px;"><a style="text-decoration: none" th:text="'阅读:'+${article.ReadCount}"></a></div><div class="comment" style="display:inline-block;margin-right:10px;"><a href="#" style="text-decoration: none" th:text="'评论:'+${article.CommentCount}"></a></div><div class="agreed" style="display:inline-block;margin-right:10px;"><a style="text-decoration: none" th:text="'点赞:'+${article.AgreedCount}"></a></div>
+		  </div>
+            <div class="cleaner"></div>
+    	</div>
+        
+    	<!-- 分页 -->
+		<ul class="pagination catepage" th:if="${articlebyidtag == 'open'}">
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:if="${ele-1>0}">Previous</a></li>
+    	<li class="page-item"><a class="page-link" style="background-color:#323232;" th:if="${ele-1<=0}">Previous</a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="'?pageid=1'+${userdot}" th:if="${ele-1>=3}">1</a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid=2'+${userdot}" th:if="${ele-2>=3}">2</a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:text="..." th:if="${ele-1>=5}"></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-2}+${userdot}" th:text="${ele-2}" th:if="${ele>2}"></a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:text="${ele-1}" th:if="${ele>1}"></a></li>
+    	<li class="page-item"><a class="page-link" style="background-color:#323232;" th:href="'?pageid='+${ele}+${userdot}" th:text="${ele}"></a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:text="${ele+1}" th:if="${total>=ele+1 }" ></a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+2}+${userdot}" th:text="${ele+2}" th:if="${total>=ele+2 }" ></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:text="..." th:if="${total-ele>=5}"></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${total-1}+${userdot}" th:text="${total-1}" th:if="${total-1-ele>=3}"></a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${total}+${userdot}" th:text="${total}" th:if="${total-ele>=3}"></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:if="${ele+1<=total}">Next</a></li>
+    	<li class="page-item hover"><a class="page-link" style="background-color:#323232;" th:if="${ele+1>total}">Next</a></li>
+  		</ul>
+        <!-- 照片墙 -->
+        <div class="container" style="width:700px;" th:if="${picturelisttag == 'open'}">
+  			<div class="card " th:each="picture:${picturelist}" style="width:250px;display:inline-block;margin-right:60px;margin-bottom:60px;border:1px solid green;background:#C1BEB5;" >
+    			<img class="card-img-top" th:src="'/testuserpicture/'+${picture.Imageurl}" alt="Card image" style="width:250px;height:250px;">
+    			<div class="card-body">
+      				<h5 class="card-title" th:text="${picture.Title}" style="color:#CF6B21"></h5>
+      				<p class="card-text" th:text="${picture.Describe}" style="color:green;margin-bottom:5px;"></p>
+      				<p style="font-size:10px;color:#CF6B21" th:text="'发布时间&nbsp;:&nbsp;'+${picture.Releasetime}"></p>     				
+      				<a th:href="@{download(filename=${picture.Imageurl})}" class="btn btn-primary" style="margin-top:20px;text-decoration:none;">下载照片</a>
+    			</div>
+  			</div>			
+  		</div>
+  		<ul class="pagination catepage" th:if="${picturetag == 'open'}">
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:if="${ele-1>0}">Previous</a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#323232;" th:if="${ele-1<=0}">Previous</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=1'+${userdot}" th:if="${ele-1>=3}">1</a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=2'+${userdot}" th:if="${ele-2>=3}">2</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${ele-1>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-2}+${userdot}" th:text="${ele-2}" th:if="${ele>2}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:text="${ele-1}" th:if="${ele>1}"></a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#323232;" th:href="'?pageid='+${ele}+${userdot}" th:text="${ele}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:text="${ele+1}" th:if="${total>=ele+1 }" ></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+2}+${userdot}" th:text="${ele+2}" th:if="${total>=ele+2 }" ></a></li>
+    		
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${total-ele>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total-1}+${userdot}" th:text="${total-1}" th:if="${total-1-ele>=3}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total}+${userdot}" th:text="${total}" th:if="${total-ele>=3}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:if="${ele+1<=total}">Next</a></li>
+    				<li class="page-item hover"><a class="page-link" style="background-color:#323232;" th:if="${ele+1>total}">Next</a></li>
+  				</ul>
+        <!-- 日记页 -->
+        <div class="post_box" th:each="diary:${diarylist}" th:if="${diarylisttag == 'open'}">
+            <div class="header">
+                <h2><a  th:text="${diary.Title}"></a></h2>
+                <span class="posted_date"  th:switch="${#strings.substring(diary.Releasetime,5,7)}">
+                    <span th:case="'1'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Jan'"></span>
+                    <span th:case="'2'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Feb'"></span>
+                    <span th:case="'3'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Mar'"></span>
+                    <span th:case="'4'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Apr'"></span>
+                    <span th:case="'5'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'May'"></span>
+                    <span th:case="'6'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Jun'"></span>
+                    <span th:case="'7'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Jul'"></span>
+                    <span th:case="'8'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Aug'"></span>
+                    <span th:case="'9'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Sep'"></span>
+                    <span th:case="'10'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Oct'"></span>
+                    <span th:case="'11'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Nov'"></span>
+                    <span th:case="'12'" th:text="${#strings.substring(diary.Releasetime,8,10)}+' '+'Dec'"></span>
+                        
+                    <strong th:text="${#strings.substring(diary.Releasetime,0,4)}"></strong>
+                </span>
+            </div>
+            <div>
+                <p th:text="${diary.Context}">
+                </p>
+		  </div>
+            <div class="cleaner"></div>
+    	</div>        
+        
+        <ul class="pagination catepage" th:if="${diarytag == 'open'}">
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:if="${ele-1>0}">Previous</a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#323232;" th:if="${ele-1<=0}">Previous</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=1'+${userdot}" th:if="${ele-1>=3}">1</a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=2'+${userdot}" th:if="${ele-2>=3}">2</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${ele-1>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-2}+${userdot}" th:text="${ele-2}" th:if="${ele>2}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:text="${ele-1}" th:if="${ele>1}"></a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#323232;" th:href="'?pageid='+${ele}+${userdot}" th:text="${ele}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:text="${ele+1}" th:if="${total>=ele+1 }" ></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+2}+${userdot}" th:text="${ele+2}" th:if="${total>=ele+2 }" ></a></li>
+    		
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${total-ele>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total-1}+${userdot}" th:text="${total-1}" th:if="${total-1-ele>=3}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total}+${userdot}" th:text="${total}" th:if="${total-ele>=3}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:if="${ele+1<=total}">Next</a></li>
+    				<li class="page-item hover"><a class="page-link" style="background-color:#323232;" th:if="${ele+1>total}">Next</a></li>
+  				</ul>
+
+		<!-- 文章详细  -->
+		<div class="post_box" th:if="${articledetailtag == 'open'}">
+            <div class="header">
+                <h2><a th:href="${article.Articleurl}" th:text="${articledetail.Title}"></a></h2>
+              <div class="tag"><strong>Tags:</strong> <a th:each="articleclass:${articledetail.articleclass}" th:text="${articleclass.Classname}+','" th:href="${articleclass.Classurl}"></a></div>
+            </div>
+            <div>
+                <p th:text="${articledetail.Context}">              	
+                </p>
+                <div class="read" style="display:inline-block;margin-right:10px;"><a style="text-decoration: none" th:text="'阅读:'+${articledetail.ReadCount}"></a></div><div class="comment" style="display:inline-block;margin-right:10px;"><a href="#commentplace" style="text-decoration: none" th:text="'评论:'+${articledetail.CommentCount}"></a></div><div class="agreed" style="display:inline-block;margin-right:10px;"><a style="text-decoration: none" href="javascript:addgredd();" th:text="'点赞:'+${articledetail.AgreedCount}" id="agreed"></a></div>
+		  		<div class="collection" style="display:inline-block;margin-right:10px;"><a style="text-decoration: none" href="javascript:collection();" id="collection" >收藏</a></div><br>
+ 
+    
+  <!-- 模态框 -->
+  <div class="modal" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+   
+        <!-- 模态框头部 -->
+        <div class="modal-header">
+          <h4 class="modal-title">收藏本文</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+   
+        <!-- 模态框主体 -->
+        <div class="modal-body">
+              <form id="CollectionSubmit">
+    				<div class="input-group mb-3">
+      				<div class="input-group-prepend">
+        			<span class="input-group-text">标题</span>
+      				</div>
+      				<input type="text" class="form-control" th:value="${articledetail.Title}" id="Title" name="Title">
+    				</div>
+					
+					<div class="input-group mb-3">
+      				<div class="input-group-prepend">
+        			<span class="input-group-text">标签</span>
+      				</div>
+      				<input type="text" class="form-control" placeholder="收藏标签" id="Label" name="Label">
+    				</div>
+    				
+    				<div class="input-group mb-3">
+      				<div class="input-group-prepend">
+        			<span class="input-group-text">摘要</span>
+      				</div>
+      				<input type="text" class="form-control" id="abstracts" name="abstracts">
+    				</div>
+ 
+    <button type="submit" class="btn btn-primary" style="float:right;">提交</button>
+  </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+		  		<a style="text-decoration: none" th:if="${next}" th:text="'《《《&nbsp;&nbsp;上一篇:'+${next.Title}" th:href="${next.Articleurl}"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" style="text-decoration: none" th:if="${last}" th:text="'下一篇:'+${last.Title}+'&nbsp;&nbsp;》》》'" th:href="${last.Articleurl}"></a><br>
+		  		<span th:text="'posted&nbsp;@&nbsp;'+${articledetail.Releasetime}+'&nbsp;'+${articledetail.Username}"></span><br></br>
+		  		<!-- 评论区 -->
+		  		<div class="container" style="padding:0px 0px;margin:0px 0px;" id="commentplace">
+					<div class="commentbox" style="padding:0px 0px;margin:0px 0px;">
+					<h5 style="color:#CF6B21;">欢迎评论:</h5>
+						<textarea cols="80" rows="50" placeholder="来说几句吧......" class="mytextarea" id="content" style="width:auto;" th:text="${test}"></textarea><br>
+						<div class="btn btn-info pull-right" id="comment" style="margin-top:8px;margin-bottom:15px;" >评论</div>
+					</div>
+					<div class="comment-list" style="padding:0px 0px;margin:0px 0px;width:62%;" >	
+			</div>
+		</div>
+		<ul class="pagination catepage" th:if="${commentarticletag == 'open'}">
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:if="${ele-1>0}">Previous</a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#323232;" th:if="${ele-1<=0}">Previous</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=1'+${userdot}" th:if="${ele-1>=3}">1</a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=2'+${userdot}" th:if="${ele-2>=3}">2</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${ele-1>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-2}+${userdot}" th:text="${ele-2}" th:if="${ele>2}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:text="${ele-1}" th:if="${ele>1}"></a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#323232;" th:href="'?pageid='+${ele}+${userdot}" th:text="${ele}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:text="${ele+1}" th:if="${total>=ele+1 }" ></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+2}+${userdot}" th:text="${ele+2}" th:if="${total>=ele+2 }" ></a></li>
+    		
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${total-ele>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total-1}+${userdot}" th:text="${total-1}" th:if="${total-1-ele>=3}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total}+${userdot}" th:text="${total}" th:if="${total-ele>=3}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:if="${ele+1<=total}">Next</a></li>
+    				<li class="page-item hover"><a class="page-link" style="background-color:#323232;" th:if="${ele+1>total}">Next</a></li>
+  				</ul>
+<!-- 评论的js -->
+<script th:inline="javascript">
+//登录用户
+var username1=[[${username1}]];
+var userid=[[${followuserid}]];
+//文章页用户
+var username=[[${username}]];
+var userids=[[${userid}]];
+//文章id
+var articleid=[[${articleid}]];
+</script>
+<script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+<script src="/js/jquery.comment.js"></script>
+<script src="http://www.jq22.com/jquery/bootstrap-3.3.4.js"></script>
+<script th:inline="javascript">
+	//初始化数据
+	var arr=[[${commentlist}]];
+	$(function(){
+		$(".comment-list").addCommentList({data:arr,add:""});
+		$("#comment").click(function(){
+			var obj = new Object();
+			obj.replyName=username1;
+			obj.content=$("#content").val();
+			obj.replyBody="";
+			$(".comment-list").addCommentList({data:[],add:obj});
+		});
+	})
+</script>
+		  </div>
+            <div class="cleaner"></div>
+    	</div>
+    	<!-- 分页显示文章 -->
+        <div class="post_box" th:each="article:${articles}" th:if="${fenyearticletag == 'open'}">
+            <div class="header">
+                <h2><a th:href="${article.Articleurl}" th:text="${article.Title}"></a></h2>
+              <div class="tag"><strong>Tags:</strong> <a th:each="articleclass:${article.articleclass}" th:text="${articleclass.Classname}+','" th:href="${articleclass.Classurl}"></a></div>
+                <span class="posted_date"  th:switch="${#strings.substring(article.Releasetime,5,7)}">
+                    <span th:case="'1'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Jan'"></span>
+                    <span th:case="'2'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Feb'"></span>
+                    <span th:case="'3'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Mar'"></span>
+                    <span th:case="'4'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Apr'"></span>
+                    <span th:case="'5'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'May'"></span>
+                    <span th:case="'6'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Jun'"></span>
+                    <span th:case="'7'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Jul'"></span>
+                    <span th:case="'8'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Aug'"></span>
+                    <span th:case="'9'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Sep'"></span>
+                    <span th:case="'10'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Oct'"></span>
+                    <span th:case="'11'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Nov'"></span>
+                    <span th:case="'12'" th:text="${#strings.substring(article.Releasetime,8,10)}+' '+'Dec'"></span>
+                        
+                    <strong th:text="${#strings.substring(article.Releasetime,0,4)}"></strong>
+                </span>
+            </div>
+            <div>
+                <p th:text="${article.Context}">
+                </p>
+                <div class="read" style="display:inline-block;margin-right:10px;"><a style="text-decoration: none" th:text="'阅读:'+${article.ReadCount}"></a></div><div class="comment" style="display:inline-block;margin-right:10px;"><a href="#" style="text-decoration: none" th:text="'评论:'+${article.CommentCount}"></a></div><div class="agreed" style="display:inline-block;margin-right:10px;"><a style="text-decoration: none" th:text="'点赞:'+${article.AgreedCount}"></a></div>
+		  </div>
+            <div class="cleaner"></div>
+    	</div>
+        
+    	<!-- 分页 -->
+		<ul class="pagination catepage" th:if="${fenyetag == 'open'}">
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:if="${ele-1>0}">Previous</a></li>
+    	<li class="page-item"><a class="page-link" style="background-color:#323232;" th:if="${ele-1<=0}">Previous</a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="'?pageid=1'+${userdot}" th:if="${ele-1>=3}">1</a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid=2'+${userdot}" th:if="${ele-2>=3}">2</a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:text="..." th:if="${ele-1>=5}"></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-2}+${userdot}" th:text="${ele-2}" th:if="${ele>2}"></a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:text="${ele-1}" th:if="${ele>1}"></a></li>
+    	<li class="page-item"><a class="page-link" style="background-color:#323232;" th:href="'?pageid='+${ele}+${userdot}" th:text="${ele}"></a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:text="${ele+1}" th:if="${total>=ele+1 }" ></a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+2}+${userdot}" th:text="${ele+2}" th:if="${total>=ele+2 }" ></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:text="..." th:if="${total-ele>=5}"></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${total-1}+${userdot}" th:text="${total-1}" th:if="${total-1-ele>=3}"></a></li>
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${total}+${userdot}" th:text="${total}" th:if="${total-ele>=3}"></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:if="${ele+1<=total}">Next</a></li>
+    	<li class="page-item hover"><a class="page-link" style="background-color:#323232;" th:if="${ele+1>total}">Next</a></li>
+  		</ul>
+    </div>
+     
+    <div id="templatemo_sidebar">
+    	<div class="sidebar_box">
+        	<h3>公告</h3>
+            <div class="sb_content">
+            	<a href="#" style="font-size:16px;line-height:28px;font-weight:normal;" th:text="'昵称:&nbsp;&nbsp;'+${username}"></a><br/>
+            	<a href="#" style="font-size:16px;line-height:28px;font-weight:normal;" th:text="'园龄:&nbsp;&nbsp;'+${hostage}"></a><br/>
+            	<a href="#" style="font-size:16px;line-height:28px;font-weight:normal;" th:text="'粉丝:&nbsp;&nbsp;'+${fanscount}"></a><br/>
+            	<a href="#" style="font-size:16px;line-height:28px;font-weight:normal;" th:text="'关注:&nbsp;&nbsp;'+${followcount}"></a><br/>
+            	<a id="weiguanzhu" href="javascript:follow();" th:style="${followtag=='open'}?'font-size:16px;line-height:28px;font-weight:normal;':'font-size:16px;line-height:28px;font-weight:normal;display:none'">+加关注</a><br/>
+            	<a id="yiguanzhu" href="#" th:style="${followtag=='false'}?'font-size:16px;line-height:28px;font-weight:normal;color:#FFA7A7;':'font-size:16px;line-height:28px;font-weight:normal;color:#FFA7A7;display:none'">已关注</a><br/>
+            </div>
+        </div>
+        
+        <div class="sidebar_box">
+        	<h3>我的标签</h3>
+            <div class="sb_content">
+            	<ul class="sidebar_menu" >
+                    <li th:each="channel,index:${userarticlelable}"><a th:href="${userurl}+'&tags='+${channel.key}" th:text="${channel.key}+'('+${channel.value}+')'"></a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="sidebar_box">
+        	<h3>阅读排行</h3>
+            <div class="sb_content">
+            	<ul class="sidebar_menu">
+                    <li th:each="ar : ${readsortarticle}"><a th:href="${ar.Articleurl}" th:text="${ar.Title}+'('+${ar.ReadCount}+')'"></a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="sidebar_box">
+        	<h3>评论排行</h3>
+            <div class="sb_content">
+            	<ul class="sidebar_menu">
+                    <li th:each="ar : ${commentsortarticle}"><a th:href="${ar.Articleurl}" th:text="${ar.Title}+'('+${ar.CommentCount}+')'"></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cleaner"></div>
+</div> <!-- end of main -->
+
+<div id="templatemo_footer">
+    <div>Copyright &copy; 2019.Company name All rights reserved.<a target="_blank" href="/home">筑梦园</a><br/>
+    		<span th:text="'Powered by ' + ${username}  + ' on Linux'"></span>
+			</div>
+</div>
+<!-- templatemo 205 web tech -->
+<!-- 
+Web Tech Template 
+http://www.templatemo.com/preview/templatemo_205_web_tech 
+-->
+</body>
+</html>

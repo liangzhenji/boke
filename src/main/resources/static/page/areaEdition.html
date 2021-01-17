@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>系统设置</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../css/public.css" media="all">
+    <style>
+        .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+    </style>
+     <script src="http://www.jq22.com/jquery/jquery-1.7.1.js"></script>
+     <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+     <script>
+   //加载数据
+     layui.use([], function () {
+ 	  var layer = layui.layer;
+    $(document).ready(function () {
+ 	   $.ajax({
+ 	        type: "POST",
+ 	        url: "/hc/getAllareaSetting",
+ 	        contentType: "application/json; charset=utf-8",
+ 	        data: "",
+ 	        dataType: "json",
+ 	        success: function (resp) {
+ 	        	$("#website_business").val(resp.website_business);
+ 	        	$("#website_class").val(resp.website_class);
+ 	        	$("#website_function").val(resp.website_function);
+ 	        	$("#website_publish").val(resp.website_publish);
+ 	        	$("#website_relevant").val(resp.website_relevant);
+ 	        },
+ 	        error: function (err) {
+ 	        	var index = layer.alert("Setting加载出错", {
+ 	                title: '错误'
+ 	            }, function () {
+ 	                layer.close(index);
+ 	            });
+ 	        }
+ 	    })
+ 	    
+      });   
+   })
+     </script>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <div class="layui-form layuimini-form">
+            
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label required">网站内容分区告示</label>
+                <div class="layui-input-block">
+                    <textareav id="website_class" lay-verify="content" name="website_class" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label required">文章发布流程</label>
+                <div class="layui-input-block">
+                    <textarea id="website_publish" lay-verify="content" name="website_publish" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label required">新功能发布</label>
+                <div class="layui-input-block">
+                    <textarea id="website_function" lay-verify="content" name="website_function" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label required">网站相关</label>
+                <div class="layui-input-block">
+                    <textarea id="website_relevant" lay-verify="content" name="website_relevant" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label required">商业合作</label>
+                <div class="layui-input-block">
+                    <textarea id="website_business" lay-verify="content" name="website_business" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-normal" lay-submit lay-filter="setting">确认保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form','layedit'], function () {
+        var form = layui.form
+            , layer = layui.layer;
+        var layedit = layui.layedit;
+        var index1 = layedit.build('website_class', {
+        	  height: 180 //设置编辑器高度
+        	});
+        var index2 = layedit.build('website_publish', {
+      	  height: 180 //设置编辑器高度
+      	});
+        var index3 = layedit.build('website_function', {
+      	  height: 180 //设置编辑器高度
+      	});
+        var index4 = layedit.build('website_relevant', {
+      	  height: 180 //设置编辑器高度
+      	});
+
+        var index5 = layedit.build('website_business', {
+      	  height: 180 //设置编辑器高度
+      	});
+        form.verify({
+            content:function () {
+                layedit.sync(index1);
+                layedit.sync(index2);
+                layedit.sync(index3);
+                layedit.sync(index4);
+                layedit.sync(index5);
+            }
+        })
+        //监听提交
+        form.on('submit(setting)', function (data) {
+			//提交有BUG，需要修改
+            data.field.website_class = $("#website_class").val();
+            console.log(JSON.stringify(data.field));
+            $.ajax({
+                type: "POST",
+                url: "/hc/areaSetting",
+                data:JSON.stringify(data.field),
+                contentType: "application/json; charset=utf-8",
+                success: function (resp) {
+                	if(resp == "success"){
+                		window.location.reload();
+                	}else{
+                		var index = layer.alert("修改失败", {
+    	                    title: '修改结果'
+    	                }, function () {
+    	                    layer.close(index);
+    	                });
+                	}                       
+                },
+                error: function (err) {
+                	var index = layer.alert("请求失败", {
+	                    title: '修改结果'
+	                }, function () {
+	                    layer.close(index);
+	                });
+                }
+            })
+        });
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<title>筑梦园</title>
+	</head>
+	<link href="plugin/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
+	<link href="logo.ico" rel="shortcut icon" />
+	<link rel="icon" href="/img/pagelogo.png" />
+	<script src="plugin/jquery.min.js"></script>
+	<script src="plugin/bootstrap/js/bootstrap.min.js"></script>
+	<link media="screen" rel="stylesheet" href="css/demo.css"/>
+	<!--<script type="text/javascript" src="plugin/jquery.page.js"></script>-->
+	<!--<script src="js/common.js"></script>-->
+	<!--<script src="js/snowy.js"></script>-->
+	<script>
+	<!--分类框-->
+	jQuery(document).ready(function(){
+	var qcloud={};
+	$('[_t_nav]').hover(function(){
+		var _nav = $(this).attr('_t_nav');
+		clearTimeout( qcloud[ _nav + '_timer' ] );
+		qcloud[ _nav + '_timer' ] = setTimeout(function(){
+		$('[_t_nav]').each(function(){
+		$(this)[ _nav == $(this).attr('_t_nav') ? 'addClass':'removeClass' ]('nav-up-selected');
+		});
+		$('#'+_nav).stop(true,true).slideDown(200);
+		}, 50);
+	},function(){
+		var _nav = $(this).attr('_t_nav');
+		clearTimeout( qcloud[ _nav + '_timer' ] );
+		qcloud[ _nav + '_timer' ] = setTimeout(function(){
+		$('[_t_nav]').removeClass('nav-up-selected');
+		$('#'+_nav).stop(true,true).slideUp(200);
+		}, 50);
+	});
+	$("#search").on("click",function(){
+		var content = $("#content").val();
+		console.log(content);
+		 window.location.href="/search?"+"content="+content;
+	});
+});
+</script>
+	<body>
+	    <!-- 主页头部 -->
+		<div class="w_header">
+			<div class="container-fluid">
+				<div class="w_header_top">
+					<a href="/home" class="w_logo"></a>
+					<span class="w_header_nav">
+					<ul>
+						<li><a href="/home" class="index" _t_nav="home">首页</a></li>
+						<li><a _t_nav="product">分类</a></li>
+						<li><a href="/evaluate">我评</a></li>
+						<li><a href="/agreed">我赞</a></li>
+						<li><a href="/follow">关注</a></li>
+						<li><a href="/manage/pagemanage?pagetag=letter">留言</a></li>
+					</ul>
+				</span>
+				<!-- 搜索框 -->
+					<div class="w_search" style="margin-right:50px;">
+						<div class="w_searchbox">
+							<input type="text" placeholder="search" id="content"/>
+							<button id="search">搜索</button>
+						</div>
+					</div>
+					<!-- 账号状态 -->
+					<span class="w_header_nav">
+					<ul th:if="${user == 'anonymousUser'}">
+						<li><a href="/login" style="color:green">登录</a></li>
+						<li><a href="/register" style="color:green">注册</a></li>
+					</ul>
+					<ul th:unless="${user == 'anonymousUser'}">
+						<li><a th:href="${userhost}" style="color:green;width:auto;" th:text="${user}"></a></li>
+						<li><a href="/logout" style="color:green">退出</a></li>
+					</ul>
+				</span>
+				</div>
+			</div>
+		</div>
+		<!-- 分类框 -->
+		<div class="navigation-down" style="z-index:2;">
+        <div id="product" class="nav-down-menu menu-1" style="display: none;" _t_nav="product">
+            <div class="navigation-down-inner">
+                <dl style="margin-left: 100px;">
+                    <dt>.NET技术</dt>
+                    <dd> <a hotrep="hp.header.product.compute1" href="/cate?cate=1">.NET新手区</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute2" href="/cate?cate=2">ASP.NET</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=3">C#</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=4">.NET Core</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=5">WinForm</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=6">Silverlight</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=7">WCF</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=8">CLR</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=9">WPF</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=10">XNA</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=11">Visual Studio</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=12">ASP.NET MVC</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=13">控件开发</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=14">Entity Framework</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=15">NHibernate</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=16">WinRT/Metro</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=17">UWP</a> </dd>
+                </dl>
+                <dl>
+                    <dt>编程语言</dt>
+                    <dd> <a hotrep="hp.header.product.storage1" href="/cate?cate=18">Java</a> </dd>
+                    <dd> <a hotrep="hp.header.product.storage2" href="/cate?cate=19">C++</a> </dd>
+                    <dd> <a hotrep="hp.header.product.storage4" href="/cate?cate=20">PHP</a> </dd>
+                    <dd> <a hotrep="hp.header.product.storage3" href="/cate?cate=21">Deiphi</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=22">Python</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=23">Ruby</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=24">C语言</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=25">Erlang</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=26">Go</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=27">Swift</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=28">Scala</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=29">R语言</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=30">Verilog</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=31">Dart</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=32">其它语言</a> </dd>
+                </dl>
+                <dl>
+                    <dt>软件设计 </dt>
+                    <dd> <a hotrep="hp.header.product.monitoring1" href="/cate?cate=33">架构设计</a> </dd>
+                    <dd> <a hotrep="hp.header.product.monitoring2" href="/cate?cate=34">面向对象</a> </dd>
+                    <dd> <a hotrep="hp.header.product.monitoring3" href="/cate?cate=35">设计模式</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=36">领域驱动设计</a> </dd>
+                </dl>
+                <dl>
+                    <dt>Web前端 </dt>
+                    <dd> <a hotrep="hp.header.product.analysis1" href="/cate?cate=37">Html/css</a> </dd>
+                    <dd> <a hotrep="hp.header.product.analysis2" href="/cate?cate=38">JavaScript</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=39">jQuery</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=40">HTML</a> </dd>
+                </dl>
+                <dl>
+                    <dt>企业信息化</dt>
+                    <dd> <a hotrep="hp.header.product.devtool1" href="/cate?cate=41">BPM</a> </dd>
+                    <dd> <a hotrep="hp.header.product.devtool2" href="/cate?cate=42">SharePoint</a> </dd>
+                    <dd> <a hotrep="hp.header.product.devtool3" href="/cate?cate=43">GIS技术</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=44">SAP</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=45">Oracle ERP</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=46">Dynamics</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=47">信息安全</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=48">企业信息化其它</a> </dd>
+                </dl>
+                <dl>
+                    <dt>手机开发</dt>
+                    <dd> <a hotrep="hp.header.product.service1" href="/cate?cate=49">Android开发</a> </dd>
+                    <dd> <a hotrep="hp.header.product.service2" href="/cate?cate=50">iOS开发</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=51">Windows Phone</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=52">Windows Mobile</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=53">其它手机开发</a> </dd>
+                </dl>
+                <dl>
+                    <dt>软件工程</dt>
+                    <dd> <a hotrep="hp.header.product.service1" href="/cate?cate=54">敏捷开发</a> </dd>
+                    <dd> <a hotrep="hp.header.product.service2" href="/cate?cate=55">项目与团队管理</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=56">软件工程其它</a> </dd>
+                </dl>
+                <dl>
+                    <dt>数据库技术</dt>
+                    <dd> <a hotrep="hp.header.product.service1" href="/cate?cate=57">SQL Server</a> </dd>
+                    <dd> <a hotrep="hp.header.product.service2" href="/cate?cate=58">Oracle</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=59">MySQL</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=60">PostgreSQL</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=61">NoSQL</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=62">大数据</a> </dd>
+                    <dd> <a hotrep="hp.header.product.compute3" href="/cate?cate=63">其它数据库</a> </dd>
+                </dl>
+            </div>
+        </div>
+        </div>
+    <!-- 主页主体 -->
+		<div class="w_container">
+			<div class="container">
+				<div class="row w_main_row">
+					<div class="col-lg-9 col-md-9 w_main_left">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title" th:text="${articlepage}"></h3>
+							</div>
+							<div class="panel-body">
+								<!--文章列表开始-->
+								<div class="contentList">
+									<div class="panel panel-default" th:each="article:${articles}">
+										<div class="panel-body">
+											<div class="contentleft">
+												<h4><a class="title" th:href="${article.Articleurl}" th:text="${article.Title}"></a></h4>
+												<p>
+													<a class="label label-default" th:each="articleclass:${article.articleclass}" th:text="${articleclass.Classname}" th:href="${articleclass.Classurl}"></a>
+												</p>
+												<p class="overView" th:text="${article.Context}"></p>
+												<p><span class="count"><i class="glyphicon glyphicon-user"></i><a th:href="${article.Hosturl}" th:text="${article.Username}"></a></span> <span class="count"><i class="glyphicon glyphicon-eye-open" th:text="'阅读:'+${article.ReadCount}"></i></span><span class="count"><i class="glyphicon glyphicon-comment" th:text="'评论:'+${article.CommentCount}"></i></span><span class="count"><i class="glyphicon glyphicon-time" th:text="${article.Releasetime}"></i></span></p>
+											</div>
+											<div class="contentImage">
+												<div class="row">
+													<a th:href="${article.Hosturl}" class="thumbnail w_thumbnail">
+														<img th:src="'img/userimg/'+${article.Imageurl}" alt="...">
+													</a>
+												</div>
+											</div>
+										</div>
+									</div>
+		<!-- 分页 -->
+		<ul class="pagination catepage">
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid='+${ele-1}+${pagesort1}" th:if="${ele-1>0}">Previous</a></li>
+    	<li class="page-item"><a class="page-link" style="background-color:#EDEDED;" th:if="${ele-1<=0}">Previous</a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid=1'+${pagesort1}" th:if="${ele-1>=3}">1</a></li>
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid=2'+${pagesort1}" th:if="${ele-2>=3}">2</a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:text="..." th:if="${ele-1>=5}"></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid='+${ele-2}+${pagesort1}" th:text="${ele-2}" th:if="${ele>2}"></a></li>
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid='+${ele-1}+${pagesort1}" th:text="${ele-1}" th:if="${ele>1}"></a></li>
+    	<li class="page-item"><a class="page-link" style="background-color:#DEDEDE;" th:href="${pagesort}+'?pageid='+${ele}+${pagesort1}" th:text="${ele}"></a></li>
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid='+${ele+1}+${pagesort1}" th:text="${ele+1}" th:if="${total>=ele+1 }" ></a></li>
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid='+${ele+2}+${pagesort1}" th:text="${ele+2}" th:if="${total>=ele+2 }" ></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:text="..." th:if="${total-ele>=5}"></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid='+${total-1}+${pagesort1}" th:text="${total-1}" th:if="${total-1-ele>=3}"></a></li>
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid='+${total}+${pagesort1}" th:text="${total}" th:if="${total-ele>=3}"></a></li>
+    	
+    	<li class="page-item"><a class="page-link" th:href="${pagesort}+'?pageid='+${ele+1}" th:if="${ele+1<=total}">Next</a></li>
+    	<li class="page-item hover"><a class="page-link" style="background-color:#EDEDED;" th:if="${ele+1>total}">Next</a></li>
+  		</ul>
+								</div>
+								<!--文章列表结束-->
+							</div>
+						</div>
+					</div>
+					<!--右侧开始-->
+					<div class="col-lg-3 col-md-3 w_main_right">
+						
+						<div class="panel panel-default sitetip">
+							<a href="#">
+								<strong>站点公告</strong>
+								<h3 class="title">站长大大有话说</h3>
+								<div class="list-group">
+    								<a href="/website_class" class="list-group-item list-group-item-action">网站内容分区告示</a>
+    								<a href="/website_publish" class="list-group-item list-group-item-action">文章发布流程</a>
+    								<a href="/website_function" class="list-group-item list-group-item-action">新功能发布</a>
+	  								<a href="/website_relevant" class="list-group-item list-group-item-action">网站相关</a>
+	  								<a href="/website_business" class="list-group-item list-group-item-action">商业合作</a>
+  								</div>
+							</a>
+						</div>
+
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">热门标签</h3>
+							</div>
+							<div class="panel-body">
+								<div class="labelList">
+									<a class="label label-default" th:each="class:${hostclass}" th:href="${class.Classurl}" th:text="${class.Classname}"></a>
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">最多阅读</h3>
+							</div>
+							<div class="panel-body">
+								<ul class="list-unstyled sidebar">
+									<li th:each="article:${readarticle}">
+										<a th:text="${article.Title}" th:href="${article.Articleurl}"></a>
+									</li>				
+								</ul>
+							</div>
+						</div>
+
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">最多评论</h3>
+							</div>
+							<div class="panel-body">
+								<ul class="list-unstyled sidebar">
+									<li th:each="article:${commentarticle}">
+										<a th:text="${article.Title}" th:href="${article.Articleurl}"></a>
+									</li>				
+								</ul>
+							</div>
+						</div>
+
+					
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="w_foot">
+			<div class="w_foot_copyright">Copyright &copy; 2019.Company name All rights reserved.<a target="_blank" href="/home">筑梦园</a>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var $backToTopEle = $('<a href="javascript:void(0)" class="Hui-iconfont toTop" title="返回顶部" alt="返回顶部" style="display:none">^</a>').appendTo($("body")).click(function() {
+			$("html, body").animate({ scrollTop: 0 }, 120);
+		});
+		var backToTopFun = function() {
+			var st = $(document).scrollTop(),
+				winh = $(window).height();
+			(st > 0) ? $backToTopEle.show(): $backToTopEle.hide();
+			/*IE6下的定位*/
+			if(!window.XMLHttpRequest) {
+				$backToTopEle.css("top", st + winh - 166);
+			}
+		};
+		$(function() {
+			$(window).on("scroll", backToTopFun);
+			backToTopFun();
+		});
+	</script>
+</html>

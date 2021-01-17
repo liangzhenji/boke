@@ -1,0 +1,782 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+      
+<head>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+<title th:text="${username}+' - '+'筑梦园'"></title>
+
+<link rel="icon" href="/img/pagelogo.png" />
+<link href="/coll/bootstrap.min.css" rel="stylesheet"/>
+<link rel="stylesheet" type="text/css" href="/coll/normalize.css" />
+<link rel="stylesheet" type="text/css" href="/coll/default.css"/>
+<link href="/coll/bootstrap-theme.min.css" rel="stylesheet" type="text/css" />
+<link href="/coll/site.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="/js/jquery-3.3.1.min.js"></script>
+
+<link href="/css/style1.css" rel="stylesheet" type="text/css" media="screen" />
+<script src="/plugin/bootstrap/js/bootstrap.min.js"></script>
+
+<script th:inline="javascript">
+$(document).ready(function(){
+  $("#tags").click(function(){
+    $("#tagslist").toggle();
+  }); 
+	$("#diaryfabu").hide();
+	$("#picturefabu").hide();
+	$(".letter").hide();
+	$("#follow").hide();
+	$(".collection").hide();
+	$("#guangli").hide();
+	$("#next").click();
+	$("#prev").click();
+	$(".wysiwyg").css("width","646px");
+	var pagetag=getUrlParam("pagetag");
+	pagetag=[[${pagetag}]];
+	switch(pagetag) {
+    case "diary":
+    	diaryfabu();
+       break;
+    case "article":
+    	articlefabu();
+       break;
+    case "picture":
+    	picturefabu();
+        break;
+    case "letter":
+    	letter();
+        break;
+    case "follow":
+    	follow();
+        break;
+    case "collection":
+    	collection();
+        break;
+    case "guangli":
+    	guangli();
+        break;
+    default:
+} 
+	$('input:radio').click(function(){
+	    var $radio = $(this);
+	    if ($radio.data('checked')){
+	      $radio.prop('checked', false);
+	      $radio.data('checked', false);
+	    } else {
+	      $radio.prop('checked', true);
+	      $radio.data('checked', true);
+	    }
+	});
+	$(".filebtn").change(function(){
+		var filePath=$(this).val();
+	    //filePath.indexOf("jpg")!=-1 || filePath.indexOf("png")!=-1
+	    if(filePath.length > 0){
+	        
+	        var arr=filePath.split('\\');
+	        var fileName=arr[arr.length-1];
+	        $(".filetips").html(fileName);
+	    }else{
+	        $(".filetips").html("上传照片");
+	    }
+	});
+	
+	$('#customRadio').click(function(){
+		if($('#customRadio').val() == "true"){
+			$('#customRadio').val("false");
+			console.log($('#customRadio').val());
+		}else{
+			$('#customRadio').val("true");
+			console.log($('#customRadio').val());
+		}
+		});
+});
+function articlefabu(){
+	$("#guangli").hide();
+	$(".letter").hide();
+	$("#diaryfabu").hide();
+	$("#picturefabu").hide();
+	$("#follow").hide();
+	$(".collection").hide();
+	$("#articlefabu").show();
+}
+function diaryfabu(){
+	$("#guangli").hide();
+	$("#articlefabu").hide();
+	$(".letter").hide();
+	$("#picturefabu").hide();
+	$("#follow").hide();
+	$(".collection").hide();
+	$("#diaryfabu").show();
+}
+function tagslist(){
+	$("#tagslist").toggle();
+}
+function picturefabu(){
+	$("#guangli").hide();
+	$("#articlefabu").hide();
+	$("#diaryfabu").hide();
+	$("#follow").hide();
+	$(".letter").hide();
+	$(".collection").hide();
+	$("#picturefabu").show();
+}
+function letter(){
+	$("#guangli").hide();
+	$("#articlefabu").hide();
+	$("#diaryfabu").hide();
+	$("#picturefabu").hide();
+	$(".collection").hide();
+	$("#follow").hide();
+	$(".letter").show();
+}
+function follow(){
+	$("#guangli").hide();
+	$(".letter").hide();
+	$("#articlefabu").hide();
+	$("#diaryfabu").hide();
+	$("#picturefabu").hide();
+	$(".collection").hide();
+	$("#follow").show();
+}
+function collection(){
+	$("#guangli").hide();
+	$(".letter").hide();
+	$("#articlefabu").hide();
+	$("#diaryfabu").hide();
+	$("#picturefabu").hide();
+	$("#follow").hide();
+	$("#collection0").show();
+	$("#collectiontag").show();
+}
+function guangli(){
+	$(".letter").hide();
+	$("#articlefabu").hide();
+	$("#diaryfabu").hide();
+	$("#picturefabu").hide();
+	$(".collection").hide();
+	$("#follow").hide();
+	$(".collection1").hide();
+	$("#guangli").show();
+}
+function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); 
+    var paramName = window.location.search.substr(1).match(reg); 
+    if(paramName != null){
+        return decodeURIComponent(paramName[2]); //decodeURIComponent 处理中文乱码
+    }
+    return null;
+}
+</script>
+<!-- 检查表单 -->
+<script>
+function checkarticle(){
+
+	if(article.Title.value == ''){
+		alert("请输入标题！！");
+		return false;
+	}else{
+		if(article.context.value == '' || article.context.value == "<p><br></p>"){
+			alert("请输入正文");
+			return false;
+		}else{
+				return true;
+			}
+		}
+}
+function checkdiary(){
+
+	if(diary.Title.value == ''){
+		alert("请输入标题！！");
+		return false;
+	}else{
+		if(diary.context.value == '' || diary.context.value == "<p><br></p>"){
+			alert("请输入正文");
+			return false;
+		}else{
+				return true;
+			}
+		}
+}
+function checkpersonal(){
+		if(personal.Username.value == '' && personal.file.value == '' && personal.Autograph.value== '' && personal.Password.value == '' && personal.Confirm.value == ''){
+			alert("请至少输入一项资料！！");
+			return false;
+		}else{
+			if(personal.Password.value != '' && personal.Confirm.value == '' ){
+				alert("请确认密码！！");
+				return false;
+			}else{
+				if(personal.Password.value != personal.Confirm.value){
+					alert("两次密码输入不同！！");
+					return false;
+				}else{
+					return true;
+				}
+			    }
+			}
+}
+</script>
+<!-- 日历插件 -->
+<style type="text/css">
+a {
+	text-decoration: none;
+}
+ul, ol, li {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+#demo {
+	width: 300px;
+	margin: 150px auto;
+}
+p {
+	margin: 0;
+}
+#dt {
+	margin: 30px auto;
+	height: 28px;
+	width: 200px;
+	padding: 0 6px;
+	border: 1px solid #ccc;
+	outline: none;
+}
+.catepage{
+	display: table;
+	margin:0px auto;
+}
+.catepage li{
+	display: table-cell; 
+}
+</style>
+<link rel="stylesheet" href="/css/calendar.css"/>
+<!-- 渲染富文本编辑器 -->
+<link rel="stylesheet" type="text/css" href="/css/print.css" media="print" />
+<!--[if lt IE 8]><link rel="stylesheet" href="../lib/blueprint/ie.css" type="text/css" media="screen, projection" /><![endif]-->
+<link rel="stylesheet" href="/css/jquery.wysiwyg.css" type="text/css"/>
+<script src="http://www.jq22.com/jquery/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="/js/jquery.wysiwyg.js"></script>
+<script type="text/javascript" src="/js/wysiwyg.image.js"></script>
+<script type="text/javascript" src="/js/wysiwyg.link.js"></script>
+<script type="text/javascript" src="/js/wysiwyg.table.js"></script>
+<script type="text/javascript">
+(function($) {
+	$(document).ready(function() {
+		$('.wysiwyg').wysiwyg({
+		  controls: {
+			bold          : { visible : true },
+			italic        : { visible : true },
+			underline     : { visible : true },
+			strikeThrough : { visible : true },
+			
+			justifyLeft   : { visible : true },
+			justifyCenter : { visible : true },
+			justifyRight  : { visible : true },
+			justifyFull   : { visible : true },
+
+			indent  : { visible : true },
+			outdent : { visible : true },
+
+			subscript   : { visible : true },
+			superscript : { visible : true },
+			
+			undo : { visible : true },
+			redo : { visible : true },
+			
+			insertOrderedList    : { visible : true },
+			insertUnorderedList  : { visible : true },
+			insertHorizontalRule : { visible : true },
+
+			h4: {
+				visible: true,
+				className: 'h4',
+				command: ($.browser.msie || $.browser.safari) ? 'formatBlock' : 'heading',
+				arguments: ($.browser.msie || $.browser.safari) ? '<h4>' : 'h4',
+				tags: ['h4'],
+				tooltip: 'Header 4'
+			},
+			h5: {
+				visible: true,
+				className: 'h5',
+				command: ($.browser.msie || $.browser.safari) ? 'formatBlock' : 'heading',
+				arguments: ($.browser.msie || $.browser.safari) ? '<h5>' : 'h5',
+				tags: ['h5'],
+				tooltip: 'Header 5'
+			},
+			h6: {
+				visible: true,
+				className: 'h6',
+				command: ($.browser.msie || $.browser.safari) ? 'formatBlock' : 'heading',
+				arguments: ($.browser.msie || $.browser.safari) ? '<h6>' : 'h6',
+				tags: ['h6'],
+				tooltip: 'Header 6'
+			},
+			
+			cut   : { visible : true },
+			copy  : { visible : true },
+			paste : { visible : true },
+			html  : { visible: true },
+			increaseFontSize : { visible : true },
+			decreaseFontSize : { visible : true },
+			exam_html: {
+				exec: function() {
+					this.insertHtml('<abbr title="exam">Jam</abbr>');
+					return true;
+				},
+				visible: true
+			}
+		  },
+		  events: {
+			click: function(event) {
+				if ($("#click-inform:checked").length > 0) {
+					event.preventDefault();
+					alert("You have clicked jWysiwyg content!");
+				}
+			}
+		  }
+		});
+	});
+})(jQuery);
+</script>
+<script th:inline="javascript">
+	if([[${tag}]] != ""){
+		if([[${tag}]] == "false"){
+			alert("操作失败");
+		}else{
+			alert("操作成功");
+		}
+	}
+</script>
+</head>
+<body>
+<div id="wrapper">
+	<div id="header-wrapper">
+		<div id="header">
+			<div id="logo">
+				<h1><a th:href="${userurl}" th:text="${username}"></a></h1>
+				<p th:text="${graph}"></p>
+			</div>
+		</div>
+	</div>
+	<!-- end #header -->
+	<div id="menu-wrapper">
+		<div id="menu">
+			<ul>
+				<li class="current_page_item"><a href="/home">筑梦园</a></li>
+				<li><a style=" outline:none;" th:href="${userurl}">首页</a></li>
+				<li><a style=" outline:none;" href="javascript:articlefabu();">文章发布</a></li>
+				<li><a style=" outline:none;" href="javascript:diaryfabu();">日记发布</a></li>
+				<li><a style=" outline:none;" href="javascript:picturefabu();">照片发布</a></li>
+				<li><a style=" outline:none;" href="javascript:letter();">留言</a></li>
+				<li><a style=" outline:none;" href="javascript:follow();">订阅</a></li>
+				<li><a style=" outline:none;" href="javascript:collection();">收藏</a></li>
+				<li><a style=" outline:none;" href="javascript:guangli();">设置</a></li>
+			</ul>
+		</div>
+	</div>
+	<!-- end #menu -->
+	<div id="page">
+		<div id="page-bgtop">
+			<div id="page-bgbtm">
+				<div id="page-content" style="margin:0px 0px;padding-left:210px;width:1200px;">
+					<div id="content">
+							<div class="container" style="width:100%;" id="articlefabu">
+  								<h2>文章发布</h2></br>
+  								<form action="/manage/articlerelease" onsubmit="return checkarticle()" name="article">
+  								
+    								<div class="input-group mb-3">
+      									<div class="input-group-prepend">
+       								 		<span class="input-group-text">标题</span>
+      									</div>
+      									<input type="text" class="form-control"  name="Title" maxlength="40"/>
+    								</div>
+    								
+    								<input type="button" class="btn btn-primary" value="标签列表" id="tags" style="margin-bottom:10px;" click="tagslist()"/>
+    								      <div style="border:1px solid #17A2B8;padding:15px 25px;margin-bottom:10px;display:none;" id="tagslist">
+      										<div class="form-check form-check-inline">
+      											<label class="form-check-label">
+        											<input type="checkbox" class="form-check-input" name="tag" th:each="class:${classlist}" th:text="${class.Classname}+'&nbsp;&nbsp;'" th:value="${class.classid}"/>
+      											</label>
+    										</div>
+    										
+    								   </div>
+									
+														<noscript>Enable JavaScript to use WYSIWYG features.</noscript>
+																<textarea class="wysiwyg" rows="14" cols="89" name="context"></textarea>
+									
+    								<button type="submit" class="btn btn-primary" style="margin-top:10px;">发布</button>
+ 								</form >
+							</div>
+							
+							<div class="container" style="width:100%;" id="diaryfabu">
+  								<h2>日记发布</h2></br>
+  								<form action="/manage/diaryrelease" onsubmit="return checkdiary()" name="diary">
+  								
+    								<div class="input-group mb-3">
+      									<div class="input-group-prepend">
+       								 		<span class="input-group-text">标题</span>
+      									</div>
+      									<input type="text" class="form-control" id="Title" name="Title"/>
+    								</div>   								
+
+								<noscript>Enable JavaScript to use WYSIWYG features.</noscript>
+																<textarea class="wysiwyg" rows="14" cols="89" name="context"></textarea>
+    								
+    								<button type="submit" class="btn btn-primary" style="margin-top:10px;">发布</button>
+ 								</form>
+							</div>
+							
+							<div class="container" style="width:100%;" id="picturefabu">
+  								<h2>照片发布</h2></br>
+  								<form action="/manage/picturerelease" method="post" enctype="multipart/form-data">
+  								
+    								<div class="input-group mb-3">
+      									<div class="input-group-prepend">
+       								 		<span class="input-group-text">标题</span>
+      									</div>
+      									<input type="text" class="form-control" id="Title" name="Title"/>
+    								</div>   								
+    								
+    								<div class="custom-file mb-3" style="display:inline-block;width:60%;margin-right:120px;">
+      										<input type="file" class="custom-file-input filebtn" id="customFile" name="file">
+      										<label class="custom-file-label filetips" for="customFile">选择照片</label>
+    								</div>
+    								
+    								<div class="custom-control custom-radio" style="display:inline-block;">
+      										<input type="radio" class="custom-control-input" id="customRadio" name="visible" value="false">
+      										<label class="custom-control-label" for="customRadio" style="padding-top:2px;color:gray;">是否可见</label>
+    								</div>
+
+									<noscript>Enable JavaScript to use WYSIWYG features.</noscript>
+																<textarea class="wysiwyg" rows="14" cols="89" name="context"></textarea>
+    								
+    								<button type="submit" class="btn btn-primary" style="margin-top:10px;">发布</button>
+ 								</form>
+							</div>
+																
+								<div class="post letter" th:each="letter:${letterlist}">
+									<h2 class="title"><a th:text="${letter.Title}"></a></h2>
+									<p class="meta" style="margin-bottom:0px;">Posted by <a th:href="${letter.Hosturl}" th:text="${letter.Username}+'&nbsp;on&nbsp;'+${letter.Releasetime}"></a>
+									
+									<div class="entry">							
+									<p th:text="${letter.Context}"></p>
+									</div>
+								</div>
+								
+								<!-- 分页 -->
+		<ul class="pagination catepage letter" >
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:if="${ele-1>0}">Previous</a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#ACEEF8;" th:if="${ele-1<=0}">Previous</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=1'+${userdot}" th:if="${ele-1>=3}">1</a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=2'+${userdot}" th:if="${ele-2>=3}">2</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${ele-1>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-2}+${userdot}" th:text="${ele-2}" th:if="${ele>2}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele-1}+${userdot}" th:text="${ele-1}" th:if="${ele>1}"></a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#ACEEF8;" th:href="'?pageid='+${ele}+${userdot}" th:text="${ele}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:text="${ele+1}" th:if="${total>=ele+1 }" ></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+2}+${userdot}" th:text="${ele+2}" th:if="${total>=ele+2 }" ></a></li>
+    		
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${total-ele>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total-1}+${userdot}" th:text="${total-1}" th:if="${total-1-ele>=3}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total}+${userdot}" th:text="${total}" th:if="${total-ele>=3}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele+1}+${userdot}" th:if="${ele+1<=total}">Next</a></li>
+    				<li class="page-item hover"><a class="page-link" style="background-color:#ACEEF8;" th:if="${ele+1>total}">Next</a></li>
+  				</ul>
+								
+								<div class="container" style="padding-left:40px;" id="follow">
+										<h2>订阅博主</h2></br>
+  										<div  th:each="users:${userlist}" class="card" style="width:252px;display:inline-block;margin-right:20px;margin-bottom:30px;border:1px solid #A5E0E5;background:#D1E3E4;">
+    										<img class="card-img-top" alt="Card image" style="width:250px;height:250px;" th:src="'../img/userimg/'+${users.Imageurl}"/>
+    										<div class="card-body">
+      											<a class="card-title" style="font-size:20px;color:#809395;" th:href="${users.Hosturl}" th:text="${users.Username}"></a>
+      										<p class="card-text" style="color:#809395;padding-bottom:0px;" th:text="${users.Autograph}"></p>   				
+    										</div>
+  										</div>		
+  										
+  										<ul class="pagination catepage" >
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele1-1}+${userdot1}" th:if="${ele1-1>0}">Previous</a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#ACEEF8;" th:if="${ele1-1<=0}">Previous</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=1'+${userdot1}" th:if="${ele1-1>=3}">1</a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid=2'+${userdot1}" th:if="${ele1-2>=3}">2</a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${ele1-1>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele1-2}+${userdot1}" th:text="${ele1-2}" th:if="${ele1>2}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele1-1}+${userdot1}" th:text="${ele1-1}" th:if="${ele1>1}"></a></li>
+    				<li class="page-item"><a class="page-link" style="background-color:#ACEEF8;" th:href="'?pageid='+${ele1}+${userdot1}" th:text="${ele1}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele1+1}+${userdot1}" th:text="${ele1+1}" th:if="${total1>=ele1+1 }" ></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele1+2}+${userdot1}" th:text="${ele1+2}" th:if="${total1>=ele1+2 }" ></a></li>
+    		
+    				<li class="page-item"><a class="page-link" th:text="..." th:if="${total1-ele1>=5}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total1-1}+${userdot1}" th:text="${total1-1}" th:if="${total1-1-ele1>=3}"></a></li>
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${total1}+${userdot1}" th:text="${total1}" th:if="${total1-ele1>=3}"></a></li>
+    	
+    				<li class="page-item"><a class="page-link" th:href="'?pageid='+${ele1+1}+${userdot1}" th:if="${ele1+1<=total1}">Next</a></li>
+    				<li class="page-item hover"><a class="page-link" style="background-color:#ACEEF8;" th:if="${ele1+1>total1}">Next</a></li>
+  				</ul>
+  								</div>
+								
+							<div class="form-group collection" id="collectiontag">
+      							<label for="sel1">收藏标签组选择:</label>
+      							<select class="form-control" name="select1" id="select1">
+        							<option th:each="channel,index:${collectionmap}" th:id="'option'+${index.index}" th:text="${channel.key}"></option>
+      							</select>
+      						</div>
+								
+				<div class="col-md-4 collection"  th:each="channel,index:${collectionmap}" th:id="'collection'+${index.index}">
+
+					<div class="panel panel-default" style="width:580px;">
+
+						<div class="panel-heading">
+
+							<span class="glyphicon glyphicon-list-alt"></span><b th:text="${channel.key}"></b></div>
+
+						<div class="panel-body">
+
+							<div class="row">
+
+								<div class="col-xs-12">
+
+									<ul class="demo1">
+									
+
+										<li class="news-item" th:each="cl:${channel.value}">
+
+											<table cellpadding="4">
+
+												<tr>
+
+													<td><img th:src="'../img/userimg/'+${cl.imageurl}" width="60px" height="60px" class="img-circle" /></td>
+
+													<td style=""><p th:text="${cl.Abstracts}"></p><a th:href="${cl.articleurl}">Read more...</a></td>
+
+												</tr>
+
+											</table>
+
+										</li>
+
+										
+
+									</ul>
+
+								</div>
+
+							</div>
+
+						</div>
+
+						<div class="panel-footer">
+
+
+
+						</div>
+
+					</div>
+
+				</div>
+				
+				
+							
+					<div class="container" style="width:100%;" id="guangli">
+  								<h2>个人设置</h2></br>
+  								<form action="/manage/personal" method="post" name="personal"  onsubmit="return checkpersonal()" enctype="multipart/form-data"> 
+  								
+    								<div class="input-group mb-3">
+      									<div class="input-group-prepend">
+       								 		<span class="input-group-text">用户名</span>
+      									</div>
+      									<input type="text" class="form-control" id="Username" name="Username" maxlength="20"/>
+    								</div>
+    								
+    								<div class="custom-file mb-3" style="width:60%;">
+      										<input type="file" class="custom-file-input file-btn" id="customFile" name="file"/>
+      										<label class="custom-file-label" for="customFile">选择头像</label>
+    								</div>
+    								
+    								<div class="input-group mb-3">
+      									<div class="input-group-prepend">
+       								 		<span class="input-group-text">个性签名</span>
+      									</div>
+      									<input type="text" class="form-control" id="Autograph" name="Autograph" maxlength="60"/>
+    								</div>
+    								
+    								<div class="input-group mb-3">
+      									<div class="input-group-prepend">
+       								 		<span class="input-group-text">密码</span>
+      									</div>
+      									<input type="text" class="form-control" id="Password" name="Password" maxlength="20"/>
+    								</div>
+    								
+    								<div class="input-group mb-3">
+      									<div class="input-group-prepend">
+       								 		<span class="input-group-text">确认密码</span>
+      									</div>
+      									<input type="text" class="form-control" id="Confirm" name="Confirm" maxlength="20"/>
+    								</div>
+    								
+    								<button type="submit" class="btn btn-primary" style="display:block;">更改</button>
+ 								</form >
+							</div>		
+							
+					</div>
+					
+					<!-- end #content -->
+					<div id="sidebar" style="margin-right:105px;">
+						<div id="demo" style="margin:0px 0px; font: 500 14px 'roboto';color: #333;">
+  							<div id="ca"></div>
+  							
+						</div>
+						<div class="card" style="width:282px;display:inline-block;margin-top:20px;margin-left:20px;margin-bottom:30px;border:1px solid #A5E0E5;background:#D1E3E4;" >
+    										<img class="card-img-top" alt="Card image" style="width:280px;height:280px;" th:src="'../img/userimg/'+${Imageurl}"/>
+    										<div class="card-body">
+      											<a class="card-title" style="font-size:20px;color:#809395;" th:href="${userurl}" th:text="${username}"></a>
+      											<p class="card-text" style="color:#809395;padding-bottom:0px;" th:text="'粉丝数:'+${fanscount}"></p>
+      											<p class="card-text" style="color:#809395;padding-bottom:0px;" th:text="'关注数:'+${followcount}"></p>
+      											<p class="card-text" style="color:#809395;padding-bottom:0px;" th:text="'已发表文章:'+${articlecount}"></p>   				
+    										</div>
+  										</div>	
+					</div>
+					<!-- end #sidebar -->
+				</div>
+				<div style="clear: both;">&nbsp;</div>
+			</div>
+		</div>
+	</div>
+	<!-- end #page -->
+</div>
+<div id="footer">
+	<p>Copyright (c) 2012 Sitename.com. All rights reserved. Design by <a href="http://www.freecsstemplates.org/" rel="nofollow">FreeCSSTemplates.org</a>.</p>
+</div>
+<!-- end #footer -->
+<!-- 标签选择框 -->
+<script>
+	 var select = document.getElementById("select1");
+ select.onchange = function() {
+     var options = this.options;
+     for (var i = 0; i < options.length; i++) {
+         if (options[i].selected) {
+             var divid = options[i].id.replace("option", "collection");
+             document.getElementById(divid).style.display = "block";
+         } else {
+             var divid = options[i].id.replace("option", "collection");
+             document.getElementById(divid).style.display = "none";
+         }
+     }
+ }
+</script>
+<!-- 日历插件 -->
+<script src="/js/jquery.js"></script> 
+<script src="/js/calendar.js"></script> 
+<script>
+    $('#ca').calendar({
+        width: 320,
+        height: 320,
+        data: [
+			{
+			  date: '2015/12/24',
+			  value: 'Christmas Eve'
+			},
+			{
+			  date: '2015/12/25',
+			  value: 'Merry Christmas'
+			},
+			{
+			  date: '2016/01/01',
+			  value: 'Happy New Year'
+			}
+		],
+        onSelected: function (view, date, data) {
+        }
+    });
+
+    $('#dd').calendar({
+        trigger: '#dt',
+        zIndex: 999,
+		format: 'yyyy-mm-dd',
+        onSelected: function (view, date, data) {
+        },
+        onClose: function (view, date, data) {
+        }
+    });
+</script>
+<!-- 标签滚动 -->
+<script src="/js/jquery-1.8.0.js" type="text/javascript"></script>
+
+	<script src="/js/jquery.bootstrap.newsbox.min.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+
+    $(function () {
+
+        $(".demo1").bootstrapNews({
+
+            newsPerPage: 5,
+
+            autoplay: true,
+
+			pauseOnHover:true,
+
+            direction: 'up',
+
+            newsTickerInterval: 4000,
+
+            onToDo: function () {
+
+                //console.log(this);
+
+            }
+
+        });
+		$(".demo2").bootstrapNews({
+
+            newsPerPage: 4,
+
+            autoplay: true,
+
+			pauseOnHover: true,
+
+			navigation: false,
+
+            direction: 'down',
+
+            newsTickerInterval: 2500,
+
+            onToDo: function () {
+
+                //console.log(this);
+
+            }
+
+        });
+        $("#demo3").bootstrapNews({
+
+            newsPerPage: 3,
+
+            autoplay: false,
+
+            onToDo: function () {
+
+                //console.log(this);
+            }
+
+        });
+
+    });
+</script>
+</body>
+</html>

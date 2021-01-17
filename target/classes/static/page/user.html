@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">用户名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="username" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">登录名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="loginname" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">权限</label>
+                            <div class="layui-input-inline">
+                            	<select name="role" autocomplete="off"  lay-reqtext="权限不能为空">
+        							<option value="" selected="">请选择权限</option>
+        							<option value="3">用户</option>
+        							<option value="1">管理员</option>
+      							</select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+        </script>
+
+    </div>
+</div>
+<script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+      var usertable = table.render({
+            elem: '#currentTableId',
+            url: '/hc/findAllUser',
+            where:{
+                searchParams: ""
+            },
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [[
+                {type: "checkbox", width: 50},
+                {field: 'userid', width: 70, title: 'ID', sort: true},
+                {field: 'username', width: 80, title: '用户名'},
+                {field: 'loginname', width: 80, title: '登录名'},
+                {field: 'roles', width: 80, title: '权限'},
+                {field: 'firstlogintime', width: 80, title: '注册时间',},
+                {field: 'lastlogintime', width: 80, title: '最后登录时间'},
+                {field: 'autograph', title: '签名', minWidth: 150},
+                {field: 'fanscount', width: 80, title: '粉丝数', sort: true},
+                {field: 'followcount', width: 80, title: '关注数', sort: true},
+                {field: 'password', width: 80, title: '密码'},
+                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+            ]],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 15,
+            page: true,
+            skin: 'line'
+        });
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: {
+                    searchParams: result
+                }
+            }, 'data');
+
+            return false;
+        });
+
+        /**
+         * toolbar监听事件
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                var index = layer.open({
+                    title: '添加用户',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '../page/table/add.html',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {  // 监听删除操作            	
+                var checkStatus = table.checkStatus('currentTableId')
+                    , datas = checkStatus.data;
+                var userids = new Array();
+                for(var i = 0;i<datas.length;i++){
+                	userids.push(datas[i].userid);              
+                }
+                console.log(userids);
+                json = {
+                	"userids" : userids
+                }
+                if(userids.length > 0){
+                	layer.confirm('真的删除行么', function (indexOut) {
+                		layer.close(indexOut);
+                	$.ajax({
+                        type: "POST",
+                        url: "/hc/hcdeletes",
+                        data:JSON.stringify(json),
+                        contentType: "application/json; charset=utf-8",
+                        success: function (resp) {
+                        	if(resp == "success"){
+                        		usertable.reload();
+                        	}else{
+                        		var index = layer.alert("删除失败", {
+            	                    title: '删除结果'
+            	                }, function () {
+            	                    layer.close(index);
+            	                });
+                        	}                       
+                        },
+                        error: function (err) {
+                        	var index = layer.alert("请求失败", {
+        	                    title: '删除结果'
+        	                }, function () {
+        	                    layer.close(index);
+        	                });
+                        }
+                    })
+                })
+                }else{
+                	var index = layer.alert("请添加删除项", {
+	                    title: '提示'
+	                }, function () {
+	                    layer.close(index);
+	                });
+                }            
+            }
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+        	console.log(obj);
+            var data = obj.data;
+            if (obj.event === 'edit') {
+
+                var index = layer.open({
+                    title: '编辑用户',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '../page/table/edit.html',
+                    success: function (layero, index) {    //成功获得加载changefile.html时，预先加载，将值从父窗口传到 子窗口
+                        //// console.log(obj.data.editAble);
+                        let body = layer.getChildFrame('body', index);
+                        //console.log(rowselect[0].filename);
+                        body.find("#username").val(obj.data.username);   //通过class名进行获取数据
+                        body.find("#loginname").val(obj.data.loginname);
+                        body.find("#userid").val(obj.data.userid);//意思是将rowselect[0].path这个值传递到子窗口的class="filepath"这个的文本框中，（预先加载）
+                        //body.find(".menuid").val(rowselect[0].previousid);
+                        layui.form.render();
+                        
+                    }
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (indexOut) {
+                	var json = {
+                			userid : obj.data.userid
+                	}
+                	layer.close(indexOut);
+                	$.ajax({
+                        type: "POST",
+                        url: "/hc/hcdelete",
+                        data:JSON.stringify(json),
+                        contentType: "application/json; charset=utf-8",
+                        success: function (resp) {
+                        	if(resp == "success"){
+                        		obj.del();
+                        	}else{
+                        		var index = layer.alert("删除失败", {
+            	                    title: '删除结果'
+            	                }, function () {
+            	                    layer.close(index);
+            	                });
+                        	}                       
+                        },
+                        error: function (err) {
+                        	var index = layer.alert("请求失败", {
+        	                    title: '删除结果'
+        	                }, function () {
+        	                    layer.close(index);
+        	                });
+                        }
+                    })                  
+                });
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>
